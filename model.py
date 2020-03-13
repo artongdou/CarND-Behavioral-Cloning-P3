@@ -7,7 +7,7 @@ import cv2
 import csv
 import math
 
-path_to_data = '/opt/mydata/data/'
+path_to_data = '/opt/carnd_p3/data/'
 
 print('reading csv log file...')
 samples = []
@@ -31,7 +31,7 @@ def generator(samples, batch_size=32):
             # read batch samples
             imgs = []
             measurements = []
-            for sample in samples:
+            for sample in batch_samples:
                 source_path = sample[0]
                 filename = source_path.split('/')[-1]
                 current_path = path_to_data + 'IMG/' + filename
@@ -43,6 +43,7 @@ def generator(samples, batch_size=32):
             yield shuffle(X_batch, y_batch)
 
 BATCH_SIZE = 32
+NUM_OF_EPOCHS = 5
 train_generator = generator(train_samples, BATCH_SIZE)
 valid_generator = generator(validation_samples, BATCH_SIZE)
 
@@ -56,7 +57,8 @@ print('training model...')
 model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
 model.fit_generator(train_generator, \
                     steps_per_epoch=math.ceil(len(train_samples)/BATCH_SIZE), \
-                    epochs=5, \
+                    epochs=NUM_OF_EPOCHS, \
                     verbose=1, \
                     validation_data=valid_generator, \
                     validation_steps=math.ceil(len(validation_samples)/BATCH_SIZE))
+model.save('model.h5')
