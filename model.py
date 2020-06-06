@@ -27,24 +27,32 @@ def generator(samples, batch_size=32):
     num_samples = len(samples)
     while True:
         shuffle(samples)
-        for i in range(0, num_samples, batch_size//2):
-            batch_samples = samples[i:i+batch_size//2]
+        for i in range(0, num_samples, batch_size//6):
+            batch_samples = samples[i:i+batch_size//6]
             # read batch samples
             imgs = []
             measurements = []
             for sample in batch_samples:
-                source_path = sample[0]
-                filename = source_path.split('/')[-1]
-                current_path = path_to_data + 'IMG/' + filename
-                img = ndimage.imread(current_path)
-                imgs.append(img)
-                imgs.append(np.fliplr(img))
-                measurements.extend([float(line[3]),-float(line[3])])
+                center_camera = sample[0].split('.')[-1]
+                left_camera = sample[1].split('.')[-1]
+                right_camera = sample[2].split('.')[-1]
+
+                img_center = ndimage.imread(path_to_data + 'IMG/' + center_camera)
+                img_left = ndimage.imread(path_to_data + 'IMG/' + left_camera)
+                img_right = ndimage.imread(path_to_data + 'IMG/' + right_camera)
+                imgs.append(img_center)
+                imgs.append(img_left)
+                imgs.append(img_right)
+                imgs.extend([np.fliplr(img_center), np.fliplr(img_left), np.fliplr(img_right)])
+                steering = float(line[3])
+                steer_offset = 0.2 # left: negative
+                measurements.extend([steering, steering+steer_offset, steering-steer_offset])
+                measurements.extend([-steering, -(steering+steer_offset), -(steering-steer_offset)])
             X_batch = np.array(imgs)
             y_batch = np.array(measurements)
             yield shuffle(X_batch, y_batch)
 
-BATCH_SIZE = 32
+BATCH_SIZE = 48
 NUM_OF_EPOCHS = 5
 train_generator = generator(train_samples, BATCH_SIZE)
 valid_generator = generator(validation_samples, BATCH_SIZE)
