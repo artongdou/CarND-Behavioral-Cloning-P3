@@ -68,13 +68,18 @@ def random_shift(img):
     shifted_left_img = np.reshape(shifted_left_img, (rows, cols, 1))
     return shifted_left_img, shifted_right_img, offset
 
+def visualize_data():
+    steering = [np.float32(logs[i][3]) for i in range(len(logs))]
+    plt.hist(steering, bins=19)
+    plt.show()
+
 def load_data():
     #load center -> left -> right images
-    pixel_to_angle = 0.01
+    pixel_to_angle = 0.02
     for i in range(3):
         for j in range(len(logs)):
         # for j in range(1000):
-            if float(logs[j][3]) <= 0.001:
+            if float(logs[j][3]) <= 0.04:
                 continue
             img_filename = logs[j][i].split('\\')[-1].strip()
             # print(img_filename)
@@ -153,6 +158,7 @@ def nvidia():
 
 if __name__ == '__main__':
     # pass
+    # visualize_data()
     load_data()
     print(samples[0].shape)
     X = np.array(samples)
@@ -161,6 +167,7 @@ if __name__ == '__main__':
     print("labels shape: {}".format(y.shape));
     X, y = shuffle(X, y)
 
+    # print(np.max(y), np.min(y))
     # plt.hist(y, bins=19)
     # plt.show()
 
