@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import random
 import math
+import datetime
+import os
+from sklearn.utils import shuffle
 
 # Import for workspace
 # from keras import Model, Sequential
@@ -13,30 +16,21 @@ import math
 # from keras import backend
 
 # import for local PC
-from tensorflow_core.python.keras import Model, Sequential
-from tensorflow_core.python.keras.api._v2.keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
-from tensorflow_core.python.keras.callbacks import EarlyStopping
-from tensorflow_core.python.keras import backend
-
 import tensorflow as tf
-from sklearn.utils import shuffle
+from tensorflow.keras import Model, Sequential
+from tensorflow.keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
+from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
+from tensorflow.keras import backend
+from tensorflow.keras.optimizers.schedules import ExponentialDecay
+from tensorflow.keras.optimizers import Adam
 
 backend.clear_session()
 
 # mydata_path = '/opt/carnd_p3/data'
-mydata_path = '../run4'
-img_rows = 66
-img_cols = 200
-
-# load logs
-logs = []
-with open(mydata_path + '/driving_log.csv','rt') as f:
-    reader = csv.reader(f)
-    for line in reader:
-        # print(line)
-        logs.append(line)
-    # logs.pop(0)
-print("number of images: ", len(logs))
+# mydata_path = '../run4'
+img_rows = 80
+img_cols = 160
+tensorboard_log = False
 
 # samples
 samples = []
@@ -73,13 +67,24 @@ def visualize_data():
     plt.hist(steering, bins=19)
     plt.show()
 
-def load_data():
+def load_data(mydata_path, visualize = False):
+    # load logs
+    logs = []
+    with open(mydata_path + '/driving_log.csv','rt') as f:
+        reader = csv.reader(f)
+        for line in reader:
+            # print(line)
+            logs.append(line)
+        # logs.pop(0)
+    print("number of images: ", len(logs))
+    if visualize:
+        visualize_data()
     #load center -> left -> right images
-    pixel_to_angle = 0.02
+    pixel_to_angle = 0.001
     for i in range(3):
         for j in range(len(logs)):
         # for j in range(1000):
-            if float(logs[j][3]) <= 0.04:
+            if float(logs[j][3]) <= 0.001:
                 continue
             img_filename = logs[j][i].split('\\')[-1].strip()
             # print(img_filename)
@@ -115,9 +120,9 @@ def load_data():
                            -steering + pixel_shifted*pixel_to_angle, -steering - pixel_shifted*pixel_to_angle])
 
 def test():
-    imgc = cv2.imread("C:\\Users\\Chishing\\Desktop\\beta_simulator_windows\\run2\\IMG\\left_2020_06_07_02_27_11_352.jpg")
-    imgl = cv2.imread("C:\\Users\\Chishing\\Desktop\\beta_simulator_windows\\run2\\IMG\\center_2020_06_07_02_27_11_352.jpg")
-    imgr = cv2.imread("C:\\Users\\Chishing\\Desktop\\beta_simulator_windows\\run2\\IMG\\right_2020_06_07_02_27_11_352.jpg")
+    imgc = cv2.imread("../run4_curve/IMG/left_2020_06_08_17_54_15_939.jpg")
+    imgl = cv2.imread("../run4_curve/IMG/center_2020_06_08_17_54_15_939.jpg")
+    imgr = cv2.imread("../run4_curve/IMG/right_2020_06_08_17_54_15_939.jpg")
     fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
     fig.suptitle('Horizontally stacked subplots')
     ax1.imshow(np.reshape((preprocess_img(imgl)), (img_rows, img_cols)), cmap='gray')
@@ -157,26 +162,47 @@ def nvidia():
     ])
 
 if __name__ == '__main__':
-    # pass
-    # visualize_data()
-    load_data()
-    print(samples[0].shape)
+    # test()
+    load_data('../run4')
+    load_data('../run4_curve')
+    # load_data('/opt/carnd_p3/data')
     X = np.array(samples)
     print("samples shape: {}".format(X.shape))
     y = np.array(labels)
     print("labels shape: {}".format(y.shape));
     X, y = shuffle(X, y)
 
+    # plot histogram of training/validation set
     # print(np.max(y), np.min(y))
     # plt.hist(y, bins=19)
     # plt.show()
 
     model = simple_model()
-    # model = nvidia()
     model.summary()
-    model.compile(optimizer='adam', loss='mean_squared_error')
+
+    # learning rate decay
+    lr_schedule = ExponentialDecay(
+        initial_learning_rate=0.001,
+        decay_steps=10000,
+        decay_rate=0.9
+    )
+
+    optmzr = Adam(learning_rate=lr_schedule)
+    # optmzr = tf.keras.optimizers.Adam()
+
+    model.compile(optimizer=optmzr, loss='mean_squared_error')
 
     early_stop_cb = EarlyStopping(monitor='loss', patience=3)
-    model.fit(X, y, batch_size=512, epochs=15, verbose=1,
-                validation_split=0.2, shuffle=True, callbacks=[early_stop_cb])
+
+    if tensorboard_log:
+        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        log_dir = os.path.normpath(log_dir)
+        os.mkdir(log_dir)
+        print("log directory: ", log_dir)
+        tensorboard_cb = TensorBoard(log_dir=log_dir, histogram_freq=1)
+        callbacks=[early_stop_cb, tensorboard_cb]
+    else:
+        callbacks=[early_stop_cb]
+    model.fit(X, y, batch_size=32, epochs=50, verbose=1,
+                validation_split=0.2, shuffle=True, callbacks=callbacks)
     model.save('model.h5')
