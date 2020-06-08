@@ -7,16 +7,16 @@ import random
 import math
 
 # Import for workspace
-# from keras import Model, Sequential
-# from keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
-# from keras.callbacks import EarlyStopping
-# from keras import backend
+from keras import Model, Sequential
+from keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
+from keras.callbacks import EarlyStopping
+from keras import backend
 
 # import for local PC
-from tensorflow_core.python.keras import Model, Sequential
-from tensorflow_core.python.keras.api._v2.keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
-from tensorflow_core.python.keras.callbacks import EarlyStopping
-from tensorflow_core.python.keras import backend
+# from tensorflow_core.python.keras import Model, Sequential
+# from tensorflow_core.python.keras.api._v2.keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
+# from tensorflow_core.python.keras.callbacks import EarlyStopping
+# from tensorflow_core.python.keras import backend
 
 import tensorflow as tf
 from sklearn.utils import shuffle
@@ -25,8 +25,8 @@ backend.clear_session()
 
 # mydata_path = '/opt/carnd_p3/data'
 mydata_path = '../run4'
-img_rows = 66
-img_cols = 200
+img_rows = 80
+img_cols = 160
 
 # load logs
 logs = []
@@ -75,11 +75,11 @@ def visualize_data():
 
 def load_data():
     #load center -> left -> right images
-    pixel_to_angle = 0.02
+    pixel_to_angle = 0.01
     for i in range(3):
         for j in range(len(logs)):
         # for j in range(1000):
-            if float(logs[j][3]) <= 0.04:
+            if float(logs[j][3]) <= 0.001:
                 continue
             img_filename = logs[j][i].split('\\')[-1].strip()
             # print(img_filename)
@@ -177,6 +177,6 @@ if __name__ == '__main__':
     model.compile(optimizer='adam', loss='mean_squared_error')
 
     early_stop_cb = EarlyStopping(monitor='loss', patience=3)
-    model.fit(X, y, batch_size=512, epochs=15, verbose=1,
+    model.fit(X, y, batch_size=32, epochs=50, verbose=1,
                 validation_split=0.2, shuffle=True, callbacks=[early_stop_cb])
     model.save('model.h5')
