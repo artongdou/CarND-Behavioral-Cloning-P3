@@ -10,26 +10,28 @@ import os
 from sklearn.utils import shuffle
 
 # Import for workspace
-# from keras import Model, Sequential
-# from keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
-# from keras.callbacks import EarlyStopping
-# from keras import backend
+from keras import Model, Sequential
+from keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
+from keras.callbacks import EarlyStopping
+from keras import backend
+# from keras.optimizers.schedules import ExponentialDecay
+from keras.optimizers import Adam
 
 # import for local PC
-import tensorflow as tf
-from tensorflow.keras import Model, Sequential
-from tensorflow.keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
-from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
-from tensorflow.keras import backend
-from tensorflow.keras.optimizers.schedules import ExponentialDecay
-from tensorflow.keras.optimizers import Adam
+# import tensorflow as tf
+# from tensorflow.keras import Model, Sequential
+# from tensorflow.keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
+# from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
+# from tensorflow.keras import backend
+# from tensorflow.keras.optimizers.schedules import ExponentialDecay
+# from tensorflow.keras.optimizers import Adam
 
 backend.clear_session()
 
 # mydata_path = '/opt/carnd_p3/data'
 # mydata_path = '../run4'
-img_rows = 80
-img_cols = 160
+img_rows = 16
+img_cols = 32
 tensorboard_log = False
 
 # samples
@@ -131,15 +133,37 @@ def test():
     plt.show()
 
 def simple_model():
+#     model = Sequential([
+#                     Lambda(lambda x: x/255 - 0.5, input_shape=(img_rows,img_cols,1)),
+#                     Conv2D(filters=8, kernel_size=5, strides=1, padding='valid', activation='elu'),
+#                     MaxPooling2D((4,4),(4,4),'valid'),
+#                     Dropout(0.5),
+#                     Conv2D(filters=16, kernel_size=5, strides=1, padding='valid', activation='elu'),
+#                     MaxPooling2D((4,4),(4,4),'valid'),
+#                     Dropout(0.5),
+#                     Flatten(),
+#                     Dense(1)
+#                 ])
     model = Sequential([
-                    Lambda(lambda x: x/255 - 0.5, input_shape=(img_rows,img_cols,1)),
-                    Cropping2D(cropping=((math.floor(img_rows*3/8),math.floor(img_rows/8)),(0,0))),
-                    Conv2D(filters=16, kernel_size=5, strides=1, padding='valid', activation='relu'),
-                    MaxPooling2D((4,4),(4,4),'valid'),
+                    Lambda(lambda x: x/127.5 - 1, input_shape=(img_rows,img_cols,1)),
+                    Conv2D(filters=16, kernel_size=3, strides=1, padding='valid', activation='elu'),
+                    MaxPooling2D((2,2),(2,2),'valid'),
+                    Conv2D(filters=32, kernel_size=3, strides=1, padding='valid', activation='elu'),
+                    MaxPooling2D((2,2),(2,2),'valid'),
                     Dropout(0.5),
                     Flatten(),
+                    Dense(100, activation='elu'),
+                    Dropout(0.5),
                     Dense(1)
                 ])
+#     model = Sequential([
+#         Lambda(lambda x: x/255 - 0.5, input_shape=(img_rows,img_cols,1)),
+#         Conv2D(filters=2, kernel_size=3, strides=1, padding='valid', activation='relu'),
+#         MaxPooling2D((4,4),(4,4),'valid'),
+#         Dropout(0.25),
+#         Flatten(),
+#         Dense(1)
+#     ])
     return model
 
 def nvidia():
@@ -181,13 +205,13 @@ if __name__ == '__main__':
     model.summary()
 
     # learning rate decay
-    lr_schedule = ExponentialDecay(
-        initial_learning_rate=0.001,
-        decay_steps=10000,
-        decay_rate=0.9
-    )
+#     lr_schedule = ExponentialDecay(
+#         initial_learning_rate=0.001,
+#         decay_steps=10000,
+#         decay_rate=0.9
+#     )
 
-    optmzr = Adam(learning_rate=lr_schedule)
+    optmzr = Adam(lr=0.001, decay=0.1)
     # optmzr = tf.keras.optimizers.Adam()
 
     model.compile(optimizer=optmzr, loss='mean_squared_error')
@@ -203,6 +227,6 @@ if __name__ == '__main__':
         callbacks=[early_stop_cb, tensorboard_cb]
     else:
         callbacks=[early_stop_cb]
-    model.fit(X, y, batch_size=32, epochs=50, verbose=1,
-                validation_split=0.2, shuffle=True, callbacks=callbacks)
+    model.fit(X, y, batch_size=32, epochs=15, verbose=1,
+                validation_split=0.2, shuffle=True)
     model.save('model.h5')
