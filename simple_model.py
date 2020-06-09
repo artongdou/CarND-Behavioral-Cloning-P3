@@ -10,20 +10,20 @@ import os
 from sklearn.utils import shuffle
 
 # Import for workspace
-from keras import Model, Sequential
-from keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
-from keras.callbacks import EarlyStopping, TensorBoard
-from keras import backend
-from keras.optimizers import Adam
+# from keras import Model, Sequential
+# from keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
+# from keras.callbacks import EarlyStopping, TensorBoard
+# from keras import backend
+# from keras.optimizers import Adam
 
 # import for local PC
-# import tensorflow as tf
-# from tensorflow.keras import Model, Sequential
-# from tensorflow.keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
-# from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
-# from tensorflow.keras import backend
-# from tensorflow.keras.optimizers.schedules import ExponentialDecay
-# from tensorflow.keras.optimizers import Adam
+import tensorflow as tf
+from tensorflow.keras import Model, Sequential
+from tensorflow.keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
+from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
+from tensorflow.keras import backend
+from tensorflow.keras.optimizers.schedules import ExponentialDecay
+from tensorflow.keras.optimizers import Adam
 
 backend.clear_session()
 
@@ -69,7 +69,7 @@ def preprocess_img(img):
     return s
 
 def random_shift(img):
-    offset = math.floor(random.uniform(50, 150))
+    offset = math.floor(random.uniform(5, 15))
     M_right = np.float32([[1, 0, offset], [0, 1, 0]]) 
     M_left = np.float32([[1, 0, -offset], [0, 1, 0]]) 
     rows, cols, _ = img.shape 
@@ -90,7 +90,7 @@ def visualize_data():
     plt.hist(steering, bins=19)
     plt.show()
 
-def load_data(data_path, visualize = False, pixel_to_angle = 0.001):
+def load_data(data_path, visualize = False, pixel_to_angle = 0.01):
     # load log file
     logs = []
     with open(data_path + '/driving_log.csv','rt') as f:
