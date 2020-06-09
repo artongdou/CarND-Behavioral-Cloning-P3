@@ -10,20 +10,20 @@ import os
 from sklearn.utils import shuffle
 
 # Import for workspace
-# from keras import Model, Sequential
-# from keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
-# from keras.callbacks import EarlyStopping
-# from keras import backend
-# from keras.optimizers import Adam
+from keras import Model, Sequential
+from keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
+from keras.callbacks import EarlyStopping, TensorBoard
+from keras import backend
+from keras.optimizers import Adam
 
 # import for local PC
-import tensorflow as tf
-from tensorflow.keras import Model, Sequential
-from tensorflow.keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
-from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
-from tensorflow.keras import backend
-from tensorflow.keras.optimizers.schedules import ExponentialDecay
-from tensorflow.keras.optimizers import Adam
+# import tensorflow as tf
+# from tensorflow.keras import Model, Sequential
+# from tensorflow.keras.layers import Lambda, MaxPooling2D, Dropout, Flatten, Dense, Conv2D, Input, Cropping2D
+# from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
+# from tensorflow.keras import backend
+# from tensorflow.keras.optimizers.schedules import ExponentialDecay
+# from tensorflow.keras.optimizers import Adam
 
 backend.clear_session()
 
@@ -220,8 +220,8 @@ if __name__ == '__main__':
 
     # plot histogram of training/validation set
     # print(np.max(y), np.min(y))
-    plt.hist(y, bins=19)
-    plt.show()
+    # plt.hist(y, bins=19)
+    # plt.show()
 
     # Create simple CNN graph
     model = simple_model()
