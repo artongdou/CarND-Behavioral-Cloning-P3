@@ -2,6 +2,29 @@
 
 [![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
 
+This is a project for Udacity Self-Drving Car NanoDegree. The aim for this project is to control a car in a simulator using neural network. The implementation uses a convolutional neural network (CNN).
+
+## Dependencies
+
+- Simulator provided by Udacity contained in [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit)
+
+## How to run the project
+
+``` bash
+python drive.py model.h5
+```
+Open the simulator and select **"Autonomous Mode"**
+
+## Architecture
+
+In **training** mode, user can drive the car around the track manually and record the camera images captured by center, left and right camera. 
+
+![Camera Setup](/demo_imgs/CameraSetup.png)
+
+In **Autonomous** mode, the simulator provides `drive.py` a continuous feed of the image from the center camera in size of `160x320`. `drive.py` will run the trained CNN defined by `model.h5` to predict the steering command, which will be sent to the simulator to control the vehicle.
+
+## CNN Architecture
+
 Overview
 ---
 This repository contains starting files for the Behavioral Cloning Project.
@@ -13,7 +36,7 @@ We have provided a simulator where you can steer a car around a track for data c
 We also want you to create a detailed writeup of the project. Check out the [writeup template](https://github.com/udacity/CarND-Behavioral-Cloning-P3/blob/master/writeup_template.md) for this project and use it as a starting point for creating your own writeup. The writeup can be either a markdown file or a pdf document.
 
 To meet specifications, the project will require submitting five files: 
-* model.py (script used to create and train the model)
+* simple_model.py (script used to create and train the model)
 * drive.py (script to drive the car - feel free to modify this file)
 * model.h5 (a trained Keras model)
 * a report writeup file (either markdown or pdf)
