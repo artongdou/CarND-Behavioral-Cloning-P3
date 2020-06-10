@@ -19,7 +19,7 @@ Open the simulator and select **"Autonomous Mode"**
 
 In **training** mode, user can drive the car around the track manually and record the camera images captured by center, left and right camera. 
 
-![Camera Setup](/demo_imgs/CameraSetup.png)
+![Camera Setup](./demo_imgs/CameraSetup.png)
 
 In **Autonomous** mode, the simulator provides `drive.py` a continuous feed of the image from the center camera in size of `160x320`. `drive.py` will run the trained CNN defined by `model.h5` to predict the steering command, which will be sent to the simulator to control the vehicle.
 
@@ -87,6 +87,6 @@ Total of images are used for the training. With image augmentation, the final tr
 Train on 96422 samples, validate on 24106 samples
 ```
 
-I chose the popular `Adam` optimizer with an initial learning rate of `0.001` and `decay = 0.1`. Training is set up to train `15` epochs with an `EarlyStop` callback of patience `3`, and the training ended at epoch `14`. The validation loss over epochs is shown below:
+I chose the popular `Adam` optimizer with an initial learning rate of `0.001` and `decay = 0.1`. Batch size is chosen to be `256`. Training is set up to train `50` epochs with an `EarlyStop` callback of patience `3`, and the training ended at epoch `34`. The validation loss over epochs is shown below comparing different batch size (Data is collected using GeForce GTX 970)
 
 ![validation loss](./demo_imgs/val_loss.png)

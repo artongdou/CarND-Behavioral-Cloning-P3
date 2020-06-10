@@ -31,8 +31,8 @@ backend.clear_session()
 # mydata_path = '../run4'
 img_rows = 16
 img_cols = 32
-BATCH_SIZE = 32
-EPOCHS = 15
+BATCH_SIZE = 512
+EPOCHS = 50
 crop_top = 60
 crop_bottom = 20
 camera_steering_offset = 0.25
@@ -193,13 +193,13 @@ def get_callbacks(early_stop = False, tensorboard_log = False):
             os.mkdir('log/fit')
         
         # create folder name using timestamp
-        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + "_batch_" + str(BATCH_SIZE)
         log_dir = os.path.normpath(log_dir)
         os.mkdir(log_dir)
         print("log directory: ", log_dir)
 
         # Tensorboard callback function
-        tensorboard_cb = TensorBoard(log_dir=log_dir, histogram_freq=1)
+        tensorboard_cb = TensorBoard(log_dir=log_dir, histogram_freq=1, profile_batch=0)
         callbacks.append(tensorboard_cb)
     
     return callbacks
@@ -232,7 +232,7 @@ if __name__ == '__main__':
     # Train network
     model.fit(
         X, y, 
-        batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=1,
+        batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=2,
         validation_split=0.2, shuffle=True, 
         callbacks=get_callbacks(early_stop=True, tensorboard_log=True)
     )
