@@ -31,7 +31,7 @@ In **Autonomous** mode, the simulator provides `drive.py` a continuous feed of t
 
 Overview of the CNN layers provided in `TensorBoard` is as follows. The original idea of this architecture is from [here](https://github.com/xslittlegrass/CarND-Behavioral-Cloning), where only 63 parameters are used. I experimented with the proposed CNN and find that it's hard to achieve good result without the right data. So I made some adjustment to increase the number of parameters in the network and it turns out to work really well.
 
-![CNN Graph](./demo_imgs/tensorboard_graph.png)
+![CNN Graph](./demo_imgs/tensorboard_graph.PNG)
 
 Details of each later is defined in `simple_mode.py`. The input shape of the CNN is `16x32` and the first layer is to normalize the input to `[-1,1]`. 2 layers of `Dropout` is used to prevent overfitting. 
 
