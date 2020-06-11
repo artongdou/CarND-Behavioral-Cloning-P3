@@ -115,4 +115,4 @@ Train on 96422 samples, validate on 24106 samples
 
 I chose the popular `Adam` optimizer with an initial learning rate of `0.001` and `decay = 0.1`. Batch size is chosen to be `256`. Training is set up to train `50` epochs with an `EarlyStop` callback of patience `3`, and the training ended at epoch `34`. The validation loss over epochs is shown below comparing different batch size (Data is collected using GeForce GTX 970)
 
-![validation loss](./demo_imgs/val_loss.png)
+![validation loss](./demo_imgs/val_loss.PNG)
